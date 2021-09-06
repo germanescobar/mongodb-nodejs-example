@@ -1,28 +1,34 @@
-const { MongoClient } = require("mongodb")
+const mongoose = require('mongoose')
 
-const uri = "mongodb://127.0.0.1:27017/?retryWrites=true&writeConcern=majority";
-const client = new MongoClient(uri);
+mongoose.connect('mongodb://localhost:27017/topv10', { useNewUrlParser: true })
+
+mongoose.connection.on("error", function(e) { console.error(e) })
 
 async function run() {
-  try {
-    await client.connect();
+  // Schemas
+  const userSchema = mongoose.Schema({
+    email: {
+      type: String,
+      required: true
+    },
+    firstName: String,
+    lastName: String
+  })
 
-    const database = await client.db('topv10')
-    const usersCol = await database.collection('users')
+  // Modelo
+  const User = mongoose.model("User", userSchema)
 
-    const cursor = await usersCol.find()
-    await cursor.forEach(user => console.log(user))
+  // crear un documento
+  const user = new User({ email: "maria@example.com", firstName: "Maria", lastName: "Diaz" })
+  await user.save() // guarde en la base de datos
 
-  } finally {
-    await client.close();
-  }
+  User.create()
+
+  // listar documentos
+  const results = await User.find()
+  console.log(results)
 }
 
-run().catch(err => console.log(err))
-
-// versión promesas
-// client.connect()
-//   .then(() => client.db('topv10'))
-//   .then(database => database.collection('users'))
-//   .then(usersCol => ...)
-//   .catch(err => console.log(err))
+run().then(() => {
+  mongoose.disconnect()
+})
