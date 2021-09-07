@@ -4,7 +4,15 @@ const bcrypt = require('bcrypt')
 const userSchema = mongoose.Schema({
   email: {
     type: String,
-    required: true
+    match: /.+\@.+\..+/,
+    required: [true, "El email es requerido"],
+    validate: {
+      validator: async function(value) {
+        const user = await User.findOne({ email: value })
+        return user === null
+      },
+      message: "Email duplicado"
+    }
   },
   password: {
     type: String,
