@@ -1,0 +1,41 @@
+const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
+
+const userSchema = mongoose.Schema({
+  email: {
+    type: String,
+    required: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  firstName: String,
+  lastName: String
+})
+
+// middlewares - Chain of Responsability - no se puede utilizar arrow function
+userSchema.pre("save", async function(next) {
+  try {
+    const hash = await bcrypt.hash(this.password, 10)
+    this.password = hash
+    next()
+  } catch (err) {
+    next(err)
+  }
+})
+
+// métodos estáticos
+userSchema.statics.authenticate = async (email, password) => {
+  const user = await User.findOne({ email })
+  if (user) {
+    const result = await bcrypt.compare(password, user.password)
+    return result === true ? user : null
+  }
+
+  return null
+}
+
+const User = mongoose.model("User", userSchema)
+
+module.exports = User

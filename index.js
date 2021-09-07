@@ -1,34 +1,38 @@
 const mongoose = require('mongoose')
+const User = require('./User')
+const Post = require('./Post')
 
 mongoose.connect('mongodb://localhost:27017/topv10', { useNewUrlParser: true })
 
 mongoose.connection.on("error", function(e) { console.error(e) })
 
 async function run() {
-  // Schemas
-  const userSchema = mongoose.Schema({
-    email: {
-      type: String,
-      required: true
-    },
-    firstName: String,
-    lastName: String
-  })
+  try {
+    // crear un documento
+    // const user = new User({ email: "david@example.com", password: "test1234", firstName: "David", lastName: "Rodriguez" })
+    // await user.save() // guarde en la base de datos
 
-  // Modelo
-  const User = mongoose.model("User", userSchema)
+    /*await Post.create({ userId: "613233fb5f971766ecd37366", title: "Tercer post", content: "Contenido del tercer post",
+    tags: ["mongodb", "code"]})*/
 
-  // crear un documento
-  const user = new User({ email: "maria@example.com", firstName: "Maria", lastName: "Diaz" })
-  await user.save() // guarde en la base de datos
+    // actualizar un documento
 
-  User.create()
+    // eliminar un documento
+    /*const post = await Post.findOne({ _id: "61376fe376f579016904d9e7" })
+    await post.remove()*/
 
-  // listar documentos
-  const results = await User.find()
-  console.log(results)
+    // await Post.deleteOne({ _id: "61376fe376f579016904d9e7" })
+
+    // listar documentos
+    // const results = await Post.find()
+    // console.log(results)
+
+    const user = await User.authenticate("david@example.com", "testddd1234")
+    console.log("User: ", user)
+  } finally {
+    mongoose.disconnect()
+  }
+  
 }
 
-run().then(() => {
-  mongoose.disconnect()
-})
+run().catch(err => console.log(err))
