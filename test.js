@@ -1,5 +1,6 @@
-Array.prototype.dsd = function() {
+Array.prototype.sum = function() {
   console.log("Sum")
-}
+};
 
-[1, 2, 3].forEach(d => console.log(d))
+const arr = [1, 2, 3]
+arr.sum()
